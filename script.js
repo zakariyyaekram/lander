@@ -1,7 +1,7 @@
-var canvas = document.getElementById("game-area");
-var context = canvas.getContext("2d");
+const canvas = document.getElementById("game-area");
+const context = canvas.getContext("2d");
 
-var spaceship = {
+const spaceship = {
   color: "black",
   width: 8,
   height: 22,
