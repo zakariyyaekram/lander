@@ -1,64 +1,91 @@
 const canvas = document.getElementById("game-area");
 const context = canvas.getContext("2d");
 
-const spaceship = {
+// Set the canvas size to 400x400
+canvas.width = 400;
+canvas.height = 400;
+
+const ship = {
   color: "black",
   width: 8,
   height: 22,
   position: {
-    x: 20,
-    y: 20,
+    x: 200,
+    y: 200,
   },
   velocity: {
     x: 0,
     y: 0,
   },
-  angle: Math.PI / 2,
-  engineOn: false,
-  rotatingLeft: false,
-  rotatingRight: false,
+  mainEngine: false,
+  leftEngine: false,
+  rightEngine: false,
   crashed: false,
 };
+
+function drawTriangle(a, b, c, fill) {
+  context.beginPath();
+  context.moveTo(a[0], a[1]);
+  context.lineTo(b[0], b[1]);
+  context.lineTo(c[0], c[1]);
+  context.lineTo(a[0], a[1]);
+  context.closePath();
+  context.fillStyle = fill;
+  context.fill();
+}
 
 function drawSpaceship() {
   context.save();
   context.beginPath();
-  context.translate(spaceship.position.x, spaceship.position.y);
-  context.rotate(spaceship.angle);
+  context.translate(ship.position.x, ship.position.y);
+  // context.rotate(ship.angle);
   context.rect(
-    spaceship.width * -0.5,
-    spaceship.height * -0.5,
-    spaceship.width,
-    spaceship.height
+    ship.width * -0.5,
+    ship.height * -0.5,
+    ship.width,
+    ship.height
   );
-  context.fillStyle = spaceship.color;
+  context.fillStyle = ship.color;
   context.fill();
   context.closePath();
 
   // Draw the flame if engine is on
-  if (spaceship.engineOn) {
-    context.beginPath();
-    context.moveTo(spaceship.width * -0.5, spaceship.height * 0.5);
-    context.lineTo(spaceship.width * 0.5, spaceship.height * 0.5);
-    context.lineTo(0, spaceship.height * 0.5 + Math.random() * 10);
-    context.lineTo(spaceship.width * -0.5, spaceship.height * 0.5);
-    context.closePath();
-    context.fillStyle = "orange";
-    context.fill();
+  if (ship.mainEngine) {
+    drawTriangle(
+      [ship.width * -0.5, ship.height * 0.5],
+      [ship.width * 0.5, ship.height * 0.5],
+      [0, ship.height * 0.5 + Math.random() * 10],
+      'orange'
+    )
+  }
+  if (ship.rightEngine) {
+    drawTriangle(
+      [ship.width * 0.5, ship.height * -0.25],
+      [ship.width * 0.5 + (Math.random() * 10), 0],
+      [ship.width * 0.5, ship.height * 0.25],
+      'orange'
+    )
+  }
+  if (ship.leftEngine) {
+    drawTriangle(
+      [ship.width * -0.5, ship.height * -0.25],
+      [ship.width * -0.5 - (Math.random() * 10), 0],
+      [ship.width * -0.5, ship.height * 0.25],
+      'orange'
+    )
   }
   context.restore();
 }
 
 function updateSpaceship() {
-  if (spaceship.rotatingRight) {
-    spaceship.angle += Math.PI / 180;
-  } else if (spaceship.rotatingLeft) {
-    spaceship.angle -= Math.PI / 180;
+  if (ship.rightEngine) {
+    ship.position.x -= 1;
+  } else if (ship.leftEngine) {
+    ship.position.x += 1;
   }
 
-  if (spaceship.engineOn) {
-    spaceship.position.x += Math.sin(spaceship.angle);
-    spaceship.position.y -= Math.cos(spaceship.angle);
+  if (ship.mainEngine) {
+    ship.position.y -= 3;
   }
 }
 
@@ -76,19 +103,19 @@ function draw() {
 }
 
 function keyLetGo(event) {
-  console.log(spaceship);
+  // console.log(ship);
   switch (event.keyCode) {
     case 37:
       // Left Arrow key
-      spaceship.rotatingLeft = false;
+      ship.leftEngine = false;
       break;
     case 39:
       // Right Arrow key
-      spaceship.rotatingRight = false;
+      ship.rightEngine = false;
       break;
     case 38:
       // Up Arrow key
-      spaceship.engineOn = false;
+      ship.mainEngine = false;
       break;
   }
 }
@@ -96,19 +123,19 @@ function keyLetGo(event) {
 document.addEventListener("keyup", keyLetGo);
 
 function keyPressed(event) {
-  console.log(spaceship);
+  // console.log(ship);
   switch (event.keyCode) {
     case 37:
       // Left Arrow key
-      spaceship.rotatingLeft = true;
+      ship.leftEngine = true;
       break;
     case 39:
       // Right Arrow key
-      spaceship.rotatingRight = true;
+      ship.rightEngine = true;
       break;
     case 38:
       // Up Arrow key
-      spaceship.engineOn = true;
+      ship.mainEngine = true;
       break;
   }
 }
