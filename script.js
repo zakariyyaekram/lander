@@ -5,6 +5,10 @@ const context = canvas.getContext("2d");
 canvas.width = 400;
 canvas.height = 400;
 
+const gravity = 0.01;
+const sideEngineThrust = 0.01;
+const mainEngineThrust = 0.03;
+
 const ship = {
   color: "black",
   width: 8,
@@ -78,15 +82,24 @@ function drawSpaceship() {
 }
 
 function updateSpaceship() {
+
+  // what forces acting on the ship?
   if (ship.rightEngine) {
-    ship.position.x -= 1;
-  } else if (ship.leftEngine) {
-    ship.position.x += 1;
+    ship.velocity.x -= sideEngineThrust;
+  }
+  if (ship.leftEngine) {
+    ship.velocity.x += sideEngineThrust;
+  }
+  if (ship.mainEngine) {
+    ship.velocity.y -= mainEngineThrust;
   }
 
-  if (ship.mainEngine) {
-    ship.position.y -= 3;
-  }
+  // gravity is always acting on the ship
+  ship.velocity.y += gravity
+
+  // after calculating velocity, update our position
+  ship.position.x += ship.velocity.x;
+  ship.position.y += ship.velocity.y;
 }
 
 function draw() {
@@ -113,11 +126,14 @@ function keyLetGo(event) {
       // Right Arrow key
       ship.rightEngine = false;
       break;
-    case 38:
-      // Up Arrow key
+    case 40:
+      // Down Arrow key
       ship.mainEngine = false;
       break;
+    default:
+      return
   }
+  event.preventDefault()
 }
 
 document.addEventListener("keyup", keyLetGo);
@@ -133,11 +149,14 @@ function keyPressed(event) {
       // Right Arrow key
       ship.rightEngine = true;
       break;
-    case 38:
-      // Up Arrow key
+    case 40:
+      // Down Arrow key
       ship.mainEngine = true;
       break;
+    default:
+      return
   }
+  event.preventDefault()
 }
 
 document.addEventListener("keydown", keyPressed);
