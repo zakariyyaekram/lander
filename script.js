@@ -100,6 +100,16 @@ function updateSpaceship() {
   // after calculating velocity, update our position
   ship.position.x += ship.velocity.x;
   ship.position.y += ship.velocity.y;
+
+  // mirror ship
+  // if (ship.position.x < 0)
+  //   ship.position.x += canvas.width
+  // if (ship.position.x >= canvas.width)
+  //   ship.position.x -= canvas.width
+  // if (ship.position.y < 0)
+  //   ship.position.y += canvas.height
+  // if (ship.position.y >= canvas.height)
+  //   ship.position.y -= canvas.height
 }
 
 function draw() {
