@@ -1,3 +1,5 @@
+const startBtn = document.getElementById("startBtn");
+const statusDiv = document.getElementById("status");
 const canvas = document.getElementById("game-area");
 const ctx = canvas.getContext("2d");
 
@@ -15,15 +17,16 @@ const ship = {
   w: 8,
   h: 22,
   // position
-  x: 200,
-  y: 200,
+  x: 150 + Math.random() * 100,
+  y: 150 + Math.random() * 100,
   // velocity
-  dx: 0,
-  dy: 0,
+  dx: Math.random(),
+  dy: Math.random(),
   mainEngine: false,
   leftEngine: false,
   rightEngine: false,
   crashed: false,
+  landed: false,
 };
 
 function drawTriangle(a, b, c, fill) {
@@ -95,16 +98,40 @@ function updateSpaceship() {
   ship.y += ship.dy;
 }
 
-function draw() {
-  // Clear entire screen
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+function checkCollision() {
+  const top = ship.y - ship.h / 2;
+  const bottom = ship.y + ship.h / 2;
+  const left = ship.x - ship.w / 2;
+  const right = ship.x + ship.w / 2;
+  if (left < 0 || right > canvas.width || top < 0 || bottom > canvas.height) {
+    ship.crashed = true;
+    return;
+  }
+  if (
+    ship.dy < 0.2 &&
+    ship.dx < 0.2 &&
+    bottom > canvas.height - 5 &&
+    bottom < canvas.height
+  ) {
+    ship.landed = true;
+    return;
+  }
+}
 
+function gameLoop() {
   updateSpaceship();
 
-  // Begin drawing
-  drawSpaceship();
-
-  requestAnimationFrame(draw);
+  checkCollision();
+  if (ship.crashed) {
+    statusDiv.innerHTML = "GAME OVER - crashed";
+  } else if (ship.landed) {
+    statusDiv.innerHTML = "LANDED - you win!";
+  } else {
+    // Clear entire screen
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawSpaceship();
+    requestAnimationFrame(gameLoop);
+  }
 }
 
 function keyLetGo(event) {
@@ -152,7 +179,10 @@ function keyPressed(event) {
 }
 
 function start() {
+  startBtn.disabled = true;
+  statusDiv.innerHTML = "";
+
   document.addEventListener("keyup", keyLetGo);
   document.addEventListener("keydown", keyPressed);
-  requestAnimationFrame(draw);
+  requestAnimationFrame(gameLoop);
 }
