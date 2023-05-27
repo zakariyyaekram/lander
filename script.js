@@ -82,7 +82,6 @@ function drawSpaceship() {
 }
 
 function updateSpaceship() {
-
   // what forces acting on the ship?
   if (ship.rightEngine) {
     ship.velocity.x -= sideEngineThrust;
@@ -100,6 +99,8 @@ function updateSpaceship() {
   // after calculating velocity, update our position
   ship.position.x += ship.velocity.x;
   ship.position.y += ship.velocity.y;
+
+    
 
   // mirror ship
   // if (ship.position.x < 0)
@@ -146,8 +147,6 @@ function keyLetGo(event) {
   event.preventDefault()
 }
 
-document.addEventListener("keyup", keyLetGo);
-
 function keyPressed(event) {
   // console.log(ship);
   switch (event.keyCode) {
@@ -169,6 +168,8 @@ function keyPressed(event) {
   event.preventDefault()
 }
 
-document.addEventListener("keydown", keyPressed);
-
-draw();
+function start() {
+  document.addEventListener("keyup", keyLetGo);
+  document.addEventListener("keydown", keyPressed);
+  draw();
+}
