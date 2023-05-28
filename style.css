@@ -2,6 +2,7 @@ body {
   display: grid;
   place-content: center;
   text-align: center;
+  gap: 10px;
 }
 
 #game-area {

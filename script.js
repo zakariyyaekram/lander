@@ -17,17 +17,31 @@ const ship = {
   w: 8,
   h: 22,
   // position
-  x: 150 + Math.random() * 100,
-  y: 150 + Math.random() * 100,
+  x: 0,
+  y: 0,
   // velocity
-  dx: Math.random(),
-  dy: Math.random(),
+  dx: 0,
+  dy: 0,
   mainEngine: false,
   leftEngine: false,
   rightEngine: false,
   crashed: false,
   landed: false,
 };
+
+function initShip() {
+  // position
+  ship.x = 150 + Math.random() * 100;
+  ship.y = 150 + Math.random() * 100;
+  // velocity
+  ship.dx = Math.random();
+  ship.dy = Math.random();
+  ship.mainEngine = false;
+  ship.leftEngine = false;
+  ship.rightEngine = false;
+  ship.crashed = false;
+  ship.landed = false;
+}
 
 function drawTriangle(a, b, c, fill) {
   ctx.beginPath();
@@ -40,11 +54,10 @@ function drawTriangle(a, b, c, fill) {
   ctx.fill();
 }
 
-function drawSpaceship() {
+function drawShip() {
   ctx.save();
   ctx.beginPath();
   ctx.translate(ship.x, ship.y);
-  // context.rotate(ship.angle);
   ctx.rect(ship.w * -0.5, ship.h * -0.5, ship.w, ship.h);
   ctx.fillStyle = ship.color;
   ctx.fill();
@@ -78,7 +91,7 @@ function drawSpaceship() {
   ctx.restore();
 }
 
-function updateSpaceship() {
+function updateShip() {
   // what forces acting on the ship?
   if (ship.rightEngine) {
     ship.dx -= sideEngineThrust;
@@ -119,34 +132,32 @@ function checkCollision() {
 }
 
 function gameLoop() {
-  updateSpaceship();
+  updateShip();
 
   checkCollision();
   if (ship.crashed) {
     statusDiv.innerHTML = "GAME OVER - crashed";
+    endGame();
   } else if (ship.landed) {
     statusDiv.innerHTML = "LANDED - you win!";
+    endGame();
   } else {
     // Clear entire screen
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawSpaceship();
+    drawShip();
     requestAnimationFrame(gameLoop);
   }
 }
 
 function keyLetGo(event) {
-  // console.log(ship);
   switch (event.keyCode) {
-    case 37:
-      // Left Arrow key
+    case 37: // Left Arrow key
       ship.leftEngine = false;
       break;
-    case 39:
-      // Right Arrow key
+    case 39: // Right Arrow key
       ship.rightEngine = false;
       break;
-    case 40:
-      // Down Arrow key
+    case 40: // Down Arrow key
       ship.mainEngine = false;
       break;
     default:
@@ -157,18 +168,14 @@ function keyLetGo(event) {
 }
 
 function keyPressed(event) {
-  // console.log(ship);
   switch (event.keyCode) {
-    case 37:
-      // Left Arrow key
+    case 37: // Left Arrow key
       ship.leftEngine = true;
       break;
-    case 39:
-      // Right Arrow key
+    case 39: // Right Arrow key
       ship.rightEngine = true;
       break;
-    case 40:
-      // Down Arrow key
+    case 40: // Down Arrow key
       ship.mainEngine = true;
       break;
     default:
@@ -179,10 +186,19 @@ function keyPressed(event) {
 }
 
 function start() {
+  // console.log("start", ship);
   startBtn.disabled = true;
   statusDiv.innerHTML = "";
+  initShip();
 
   document.addEventListener("keyup", keyLetGo);
   document.addEventListener("keydown", keyPressed);
   requestAnimationFrame(gameLoop);
+}
+
+function endGame() {
+  // console.log("endGame", ship);
+  startBtn.disabled = false;
+  document.removeEventListener("keyup", keyLetGo);
+  document.removeEventListener("keydown", keyPressed);
 }
