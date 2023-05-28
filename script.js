@@ -43,14 +43,13 @@ function initShip() {
   ship.landed = false;
 }
 
-function drawTriangle(a, b, c, fill) {
+function drawTriangle(a, b, c, fillStyle) {
   ctx.beginPath();
-  ctx.moveTo(a[0], a[1]);
-  ctx.lineTo(b[0], b[1]);
-  ctx.lineTo(c[0], c[1]);
-  ctx.lineTo(a[0], a[1]);
+  // TODO: draw a triange from three points a, b, and c.
+  // points are arrays, [0] - x coordinate, [1] - y coordinate
+  // see ctx.moveTo and ctx.lineTo
   ctx.closePath();
-  ctx.fillStyle = fill;
+  ctx.fillStyle = fillStyle;
   ctx.fill();
 }
 
@@ -92,23 +91,11 @@ function drawShip() {
 }
 
 function updateShip() {
+  // TODO: update ship.dx, dy
   // what forces acting on the ship?
-  if (ship.rightEngine) {
-    ship.dx -= sideEngineThrust;
-  }
-  if (ship.leftEngine) {
-    ship.dx += sideEngineThrust;
-  }
-  if (ship.mainEngine) {
-    ship.dy -= mainEngineThrust;
-  }
-
-  // gravity is always acting on the ship
-  ship.dy += gravity;
-
-  // after calculating velocity, update our position
-  ship.x += ship.dx;
-  ship.y += ship.dy;
+  // - left, right, main thruster
+  // - gravity
+  // TODO: update the position - how does dx, dy affect x, y?
 }
 
 function checkCollision() {
@@ -116,19 +103,10 @@ function checkCollision() {
   const bottom = ship.y + ship.h / 2;
   const left = ship.x - ship.w / 2;
   const right = ship.x + ship.w / 2;
-  if (left < 0 || right > canvas.width || top < 0 || bottom > canvas.height) {
-    ship.crashed = true;
-    return;
-  }
-  if (
-    ship.dy < 0.2 &&
-    ship.dx < 0.2 &&
-    bottom > canvas.height - 5 &&
-    bottom < canvas.height
-  ) {
-    ship.landed = true;
-    return;
-  }
+  // TODO: check that ship flew out of bounds. If so, set ship.crashed = true
+
+  // TODO: check if ship landed. If so, set ship.landed = true
+  // - What conditions have to be true for a soft landing?
 }
 
 function gameLoop() {
