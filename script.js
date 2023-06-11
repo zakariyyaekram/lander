@@ -29,6 +29,25 @@ const ship = {
   landed: false,
 };
 
+const platform = {
+  color: 'blue',
+  w: 20,
+  h: 7,
+  x: 190,
+  y: 345,
+  top: 345,
+  bottom: 352,
+  left: 190,
+  right: 210,
+  
+
+}
+const lzBuffer = 3;
+function drawPLatform() {
+  ctx.fillStyle =platform.color;
+  ctx.fillRect(platform.x, platform.y,platform.w,platform.h)
+}
+
 function initShip() {
   // position
   ship.x = 150 + Math.random() * 100;
@@ -99,23 +118,64 @@ function updateShip() {
     ship.dy -= mainEngineThrust;
   }
   ship.y += ship.dy;
+  if (ship.rightEngine){
+    ship.dx -= sideEngineThrust;
+  }
+  if (ship.leftEngine){
+    ship.dx += sideEngineThrust;
+  }
+  ship.x += ship.dx;
   // TODO: update ship.dx, dy
   // what forces acting on the ship?
   // - left, right, main thruster
   // - gravity
   // TODO: update the position - how does dx, dy affect x, y?
-}
-
+} 
+ 
 function checkCollision() {
   const top = ship.y - ship.h / 2;
   const bottom = ship.y + ship.h / 2;
   const left = ship.x - ship.w / 2;
   const right = ship.x + ship.w / 2;
+
+  if (top < 0 || bottom > canvas.height || right > canvas.width || left < 0){
+    ship.crashed = true;
+  }
+
+  const isNotOverlappingPlatform =
+  bottom < platform.top ||
+  top > platform.bottom ||
+  left > platform.right ||
+  right < platform.left;
+  if (!isNotOverlappingPlatform) {
+    ship.crashed = true;
+    return;
+  }
+
+
+    
+
+
+  if (
+    ship.dx < 0.2 &&
+    ship.dy < 0.2 && 
+    left > platform.left &&
+    right < platform.right &&
+    bottom < platform.top &&
+    platform.top - bottom < lzBuffer
+  ) {
+    ship.landed = true;
+    return;
+  }
+}
+
+  
   // TODO: check that ship flew out of bounds. If so, set ship.crashed = true
+
 
   // TODO: check if ship landed. If so, set ship.landed = true
   // - What conditions have to be true for a soft landing?
-}
+
 
 function gameLoop() {
   updateShip();
@@ -131,6 +191,7 @@ function gameLoop() {
     // Clear entire screen
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawShip();
+    drawPLatform();
     requestAnimationFrame(gameLoop);
   }
 }
