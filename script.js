@@ -8,45 +8,86 @@ canvas.width = 400;
 canvas.height = 400;
 
 const gravity = 0.01;
-const sideEngineThrust = 0.01;
+const sideEngineThrust = 0.01; 
 const mainEngineThrust = 0.03;
 
-const ship = {
-  color: "black",
-  // height, width
-  w: 8,
-  h: 22,
-  // position
-  x: 0,
-  y: 0,
-  // velocity
-  dx: 0,
-  dy: 0,
-  mainEngine: false,
-  leftEngine: false,
-  rightEngine: false,
-  crashed: false,
-  landed: false,
-};
 
-const platform = {
-  color: 'blue',
-  w: 20,
-  h: 7,
-  x: 190,
-  y: 345,
-  top: 345,
-  bottom: 352,
-  left: 190,
-  right: 210,
-  
+class Rect {
+  constructor( x, y, w, h) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+  }
+  get top() {
+    return this.y; 
+  }
+  get bottom() {
+    return this.y + this.h;
+  }
+  get left() {
+    return this.x;
+  }
+  get right() {
+    return this.x + this.w;
+  }
+  get center() {
+    return {
+      x: this.x + this.w * 0.5,
+      y: this.y + this.h * 0.5,
+    }
+  }
 
+  overlaps(other) {
+    return !(
+      this.bottom < other.top ||
+      this.top > other.bottom ||
+      this.left > other.right ||
+      this.right < other.left
+    )
+  }
 }
-const lzBuffer = 3;
+
+
+
+const prjs = [];
+
+
+const ship = new Rect(0,0,8,22)
+ship.color = "black";
+ship.dx = 0;
+ship.dy = 0;
+ship.mainEngine = false;
+ship.leftEngine = false;
+ship.crashed = false;
+ship.landed = false;
+
+
+const platform = new Rect(200,390,22,8);
+platform.color = "blue";
+
+
+
+
+
+
+const lzBuffer = 1;
 function drawPLatform() {
   ctx.fillStyle =platform.color;
   ctx.fillRect(platform.x, platform.y,platform.w,platform.h)
 }
+
+
+
+function drawPrjs() {
+  for (let i = 0; i < prjs.length; i++) {
+    let prj = prjs[i];
+    ctx.fillStyle =  prj.color;
+    ctx.fillRect(prj.x, prj.y, prj.w, prj.h);
+
+  }
+}
+
 
 function initShip() {
   // position
@@ -61,6 +102,23 @@ function initShip() {
   ship.crashed = false;
   ship.landed = false;
 }
+
+
+
+function initPrjs() {
+  prjs.length = 0;
+  for (let i = 0; i < 20; i++) {
+    let prj = new Rect(Math.floor(Math.random()* 400), 0, 4, 4);
+    prj.dx = 1 - (Math.random() * 2) ;
+    prj.dy = Math.random();
+    prj.color = "brown";
+    prjs.push(prj);
+   
+  }
+}
+
+
+
 
 function drawTriangle(a, b, c, fillStyle) {
   ctx.beginPath();
@@ -78,7 +136,7 @@ function drawTriangle(a, b, c, fillStyle) {
 function drawShip() {
   ctx.save();
   ctx.beginPath();
-  ctx.translate(ship.x, ship.y);
+  ctx.translate(ship.center.x, ship.center.y);
   ctx.rect(ship.w * -0.5, ship.h * -0.5, ship.w, ship.h);
   ctx.fillStyle = ship.color;
   ctx.fill();
@@ -132,37 +190,38 @@ function updateShip() {
   // TODO: update the position - how does dx, dy affect x, y?
 } 
  
-function checkCollision() {
-  const top = ship.y - ship.h / 2;
-  const bottom = ship.y + ship.h / 2;
-  const left = ship.x - ship.w / 2;
-  const right = ship.x + ship.w / 2;
 
-  if (top < 0 || bottom > canvas.height || right > canvas.width || left < 0){
-    ship.crashed = true;
+
+function updatePrjs( ) {
+  for (let i = 0; i < prjs.length; i++) {
+    let prj = prjs[i];
+    prj.dy += gravity;
+    prj.y += prj.dy;
+    prj.x += prj.dx;
   }
+}
 
-  const isNotOverlappingPlatform =
-  bottom < platform.top ||
-  top > platform.bottom ||
-  left > platform.right ||
-  right < platform.left;
-  if (!isNotOverlappingPlatform) {
+
+function checkCollision() {
+ 
+
+  if (ship.top < 0 || ship.bottom > canvas.height || ship.right > canvas.width || ship.left < 0){
     ship.crashed = true;
     return;
   }
 
-
+  if (ship.overlaps(platform)) {
+    ship.crashed = true;
+    return;
+  }
     
-
-
   if (
     ship.dx < 0.2 &&
     ship.dy < 0.2 && 
-    left > platform.left &&
-    right < platform.right &&
-    bottom < platform.top &&
-    platform.top - bottom < lzBuffer
+    ship.left > platform.left &&
+    ship.right < platform.right &&
+    ship.bottom < platform.top &&
+    platform.top - ship.bottom < lzBuffer
   ) {
     ship.landed = true;
     return;
@@ -179,6 +238,7 @@ function checkCollision() {
 
 function gameLoop() {
   updateShip();
+  updatePrjs();
 
   checkCollision();
   if (ship.crashed) {
@@ -192,6 +252,9 @@ function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawShip();
     drawPLatform();
+    
+    
+    drawPrjs();
     requestAnimationFrame(gameLoop);
   }
 }
@@ -237,6 +300,7 @@ function start() {
   startBtn.disabled = true;
   statusDiv.innerHTML = "";
   initShip();
+  initPrjs();
 
   document.addEventListener("keyup", keyLetGo);
   document.addEventListener("keydown", keyPressed);
