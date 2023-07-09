@@ -53,6 +53,11 @@ class Rect {
 const prjs = [];
 
 
+
+
+const terrain = [];
+
+
 const ship = new Rect(0,0,8,22)
 ship.color = "black";
 ship.dx = 0;
@@ -63,18 +68,38 @@ ship.crashed = false;
 ship.landed = false;
 
 
-const platform = new Rect(200,390,22,8);
+const platform = new Rect(190,345,20,5);
 platform.color = "blue";
 
 
-
+terrain.push([0, 310]);
+terrain.push([100, 210]);
+terrain.push([platform.left, platform.bottom]);
+terrain.push([platform.right, platform.bottom]);
+terrain.push([300, 250]);
+terrain.push([350, 390]);
+terrain.push([400, 300]);
 
 
 
 const lzBuffer = 1;
 function drawPLatform() {
-  ctx.fillStyle =platform.color;
+  ctx.fillStyle = platform.color;
   ctx.fillRect(platform.x, platform.y,platform.w,platform.h)
+}
+
+
+
+function drawTerrain() {
+  ctx.beginPath();
+  ctx.moveTo(0,400);
+  for (let i = 0; i < terrain.length; i++) {
+    ctx.lineTo(terrain[i][0], terrain[i][1]);
+  }
+  ctx.lineTo(400,400);
+  ctx.closePath();
+  ctx.fillStyle = 'grey';
+  ctx.fill();
 }
 
 
@@ -107,7 +132,7 @@ function initShip() {
 
 function initPrjs() {
   prjs.length = 0;
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 10; i++) {
     let prj = new Rect(Math.floor(Math.random()* 400), 0, 4, 4);
     prj.dx = 1 - (Math.random() * 2) ;
     prj.dy = Math.random();
@@ -259,10 +284,10 @@ function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawShip();
     drawPLatform();
-    
-    
     drawPrjs();
+    drawTerrain();
     requestAnimationFrame(gameLoop);
+    
   }
 }
 
