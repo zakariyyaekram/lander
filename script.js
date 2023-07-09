@@ -81,6 +81,10 @@ terrain.push([350, 390]);
 terrain.push([400, 300]);
 
 
+function distance( a, b){
+  return Math.typot(a[0] - b[0], a[1] - b[1]);
+}
+
 
 const lzBuffer = 1;
 function drawPLatform() {
@@ -246,6 +250,9 @@ function checkCollision() {
       return;
     }
   }
+  
+
+  
     
   if (
     ship.dx < 0.2 &&
