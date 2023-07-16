@@ -82,7 +82,7 @@ terrain.push([400, 300]);
 
 
 function distance( a, b){
-  return Math.typot(a[0] - b[0], a[1] - b[1]);
+  return Math.hypot(a[0] - b[0], a[1] - b[1]);
 }
 
 
@@ -242,6 +242,32 @@ function checkCollision() {
   if (ship.overlaps(platform)) {
     ship.crashed = true;
     return;
+  }
+
+  for ( let i = 0; i < terrain.length - 1; i++) {
+    const a = terrain[i];
+    const b = terrain[i + 1];
+    const l = [ship.left, ship.bottom]
+    const r = [ship.right, ship.bottom]
+
+
+    const ablen = distance(a, b)
+    const allen = distance(a, l)
+    const arlen = distance(a, r)
+    const lblen = distance(l, b)
+    const rblen = distance(r, b)
+
+    const fudge = 0.03
+
+    if (ablen + fudge > allen + lblen) {
+      ship.crashed = true;
+      return;
+    }
+
+    if (ablen + fudge > arlen + rblen) {
+      ship.crashed = true;
+      return;
+    }
   }
 
   for (let i = 0; i < prjs.length; i++) {
